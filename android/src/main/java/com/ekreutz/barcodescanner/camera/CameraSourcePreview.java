@@ -25,6 +25,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
+import com.ekreutz.barcodescanner.ui.ErrorHandler;
 import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.Detector;
 
@@ -43,12 +44,14 @@ public class CameraSourcePreview extends ViewGroup {
     private CameraSource mCameraSource;
     private int mWidth = 0, mHeight = 0;
     private int fillMode = FILL_MODE_COVER;
+    private ErrorHandler mErrorHandler;
 
-    public CameraSourcePreview(Context context, AttributeSet attrs) {
+    public CameraSourcePreview(Context context, AttributeSet attrs, ErrorHandler errorHandler) {
         super(context, attrs);
         mContext = context;
         mStartRequested = false;
         mSurfaceAvailable = false;
+        mErrorHandler = errorHandler;
 
         mSurfaceView = new SurfaceView(context);
         mSurfaceView.getHolder().addCallback(new SurfaceCallback());
@@ -121,6 +124,9 @@ public class CameraSourcePreview extends ViewGroup {
                 Log.e(TAG,"Do not have permission to start the camera", se);
             } catch (IOException e) {
                 Log.e(TAG, "Could not start camera source.", e);
+            } catch (RuntimeException e) {
+                Log.e(TAG, "Exception is caught in surface call back", e);
+                mErrorHandler.errorOccured("runtime exception", e);
             }
         }
 
@@ -206,6 +212,9 @@ public class CameraSourcePreview extends ViewGroup {
             Log.e(TAG,"Do not have permission to start the camera", se);
         } catch (IOException e) {
             Log.e(TAG, "Could not start camera source.", e);
+        } catch ( RuntimeException e) {
+            Log.e(TAG, "Exception is caught in preview layout", e);
+            mErrorHandler.errorOccured("runtime exception", e);
         }
     }
 

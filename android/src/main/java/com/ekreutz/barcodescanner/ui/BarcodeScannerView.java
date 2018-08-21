@@ -65,6 +65,17 @@ public class BarcodeScannerView extends ViewGroup implements CameraSource.AutoFo
 
     private int mBarcodeTypes = 0; // 0 for all supported types
 
+    private class BarcodeErrorHandler implements ErrorHandler {
+
+        @Override
+        public void errorOccured(String error, Exception failure) {
+            Log.e(TAG, "Inside error occured");
+            sendNativeEvent(NOT_YET_OPERATIONAL, Arguments.createMap());
+        }
+    }
+
+    private BarcodeErrorHandler errorHandler = new BarcodeErrorHandler();
+
     public BarcodeScannerView(Context context) {
         super(context);
         mContext = context;
@@ -93,10 +104,14 @@ public class BarcodeScannerView extends ViewGroup implements CameraSource.AutoFo
     }
 
     public void init() {
-        mPreview = new CameraSourcePreview(mContext, null);
+        mPreview = new CameraSourcePreview(mContext, null, errorHandler);
         addView(mPreview);
+        try {
+            start();
+        } catch (Exception e) {
+            sendNativeEvent(NOT_YET_OPERATIONAL, Arguments.createMap());
+        }
 
-        start();
     }
 
     @Override

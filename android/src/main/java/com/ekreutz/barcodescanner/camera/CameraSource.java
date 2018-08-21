@@ -335,7 +335,9 @@ public class CameraSource {
     public void release() {
         synchronized (mCameraLock) {
             stop();
-            mFrameProcessor.release();
+            if(mFrameProcessor != null) {
+                mFrameProcessor.release();
+            }
         }
     }
 
@@ -457,7 +459,9 @@ public class CameraSource {
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to clear camera preview: " + e);
                 }
-                mCamera.release();
+                if(mCamera != null) {
+                    mCamera.release();
+                }
                 mCamera = null;
             }
         }
@@ -1160,7 +1164,9 @@ public class CameraSource {
         @SuppressLint("Assert")
         void release() {
             assert (mProcessingThread.getState() == State.TERMINATED);
-            mDetector.release();
+            if (mDetector != null) {
+                mDetector.release();
+            }
             mDetector = null;
         }
 
